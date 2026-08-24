@@ -229,7 +229,20 @@ function ScoreStepper({
       >
         <ArrowDown size={15} strokeWidth={2.1} aria-hidden="true" />
       </button>
-      <span className="score-value" data-testid={`${testId}-value`}>{value}</span>
+      <input
+        className="score-value"
+        type="number"
+        min="0"
+        step="1"
+        inputMode="numeric"
+        value={value}
+        onChange={(event) => {
+          const nextValue = Number(event.target.value);
+          onChange(Number.isFinite(nextValue) ? Math.max(0, nextValue) : 0);
+        }}
+        aria-label="Edit score"
+        data-testid={`${testId}-value`}
+      />
       <button
         className="step-button"
         type="button"
@@ -276,6 +289,9 @@ function ScoringPage({
   const photoBonuses = useMemo(() => {
     const photoScores = players.map((player) => scores[player.id]?.photos ?? 0);
     const highest = Math.max(...photoScores);
+    if (highest === 0) {
+      return Object.fromEntries(players.map((player) => [player.id, 0])) as Record<number, number>;
+    }
     const allTied = photoScores.every((score) => score === highest);
     const distinctBelowHighest = [...new Set(photoScores.filter((score) => score < highest))]
       .sort((a, b) => b - a);

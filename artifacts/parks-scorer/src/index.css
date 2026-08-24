@@ -945,12 +945,31 @@
 .step-button:disabled { cursor: not-allowed; opacity: .27; }
 
 .score-value {
+   width: 32px;
+   padding: 0;
+   border: 0;
+   outline: 0;
+   background: transparent;
   min-width: 23px;
   color: hsl(var(--foreground));
   font-family: var(--app-font-mono);
   font-size: .85rem;
   font-weight: 700;
   text-align: center;
+}
+
+.score-value:focus {
+  color: hsl(var(--destructive));
+}
+
+.score-value::-webkit-inner-spin-button,
+.score-value::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.score-value[type='number'] {
+  appearance: textfield;
 }
 
 .readonly-score {
