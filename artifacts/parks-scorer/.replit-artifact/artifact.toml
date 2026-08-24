@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Parks Board Game Scorer"
+description = "A visual scoring companion for the Parks board game, starting with an inviting setup screen for entering players and preparing a scoring session."
+version = "1.0.0"
+id = "artifacts/parks-scorer"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24896
+
+[services.development]
+run = "pnpm --filter @workspace/parks-scorer run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/parks-scorer", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/parks-scorer/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24896"
+BASE_PATH = "/"
