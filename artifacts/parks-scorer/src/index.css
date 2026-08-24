@@ -488,6 +488,19 @@
   box-shadow: 0 9px 0 hsl(var(--primary) / .12), var(--shadow-md);
 }
 
+.continue-button:disabled {
+  cursor: not-allowed;
+  color: hsl(var(--muted-foreground));
+  background: hsl(var(--muted));
+  box-shadow: 0 5px 0 hsl(var(--primary) / .07);
+  opacity: .72;
+}
+
+.continue-button:disabled .continue-arrow {
+  color: hsl(var(--muted-foreground));
+  background: hsl(var(--border));
+}
+
 .continue-button:active { transform: translateY(1px); box-shadow: 0 3px 0 hsl(var(--primary) / .12); }
 
 .continue-arrow {

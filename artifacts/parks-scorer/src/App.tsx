@@ -14,13 +14,10 @@ type Player = {
   name: string;
 };
 
-const starterNames = ['Alex', 'Morgan', 'Riley', 'Jordan', 'Casey'];
-
 function Home() {
   const [players, setPlayers] = useState<Player[]>([
-    { id: 1, name: starterNames[0] },
-    { id: 2, name: starterNames[1] },
-    { id: 3, name: starterNames[2] },
+    { id: 1, name: '' },
+    { id: 2, name: '' },
   ]);
   const [isReady, setIsReady] = useState(false);
 
@@ -40,20 +37,15 @@ function Home() {
   const addPlayer = () => {
     if (players.length >= 5) return;
     const nextId = Math.max(...players.map((player) => player.id), 0) + 1;
-    const usedNames = new Set(players.map((player) => player.name));
-    const nextName =
-      starterNames.find((name) => !usedNames.has(name)) ?? `Player ${nextId}`;
-    setPlayers((current) => [...current, { id: nextId, name: nextName }]);
+    setPlayers((current) => [...current, { id: nextId, name: '' }]);
     setIsReady(false);
   };
 
+  const allNamesEntered = players.every((player) => player.name.trim().length > 0);
+
   const continueToScoring = () => {
-    setPlayers((current) =>
-      current.map((player, index) => ({
-        ...player,
-        name: player.name.trim() || `Player ${index + 1}`,
-      })),
-    );
+    if (!allNamesEntered) return;
+    setPlayers((current) => current.map((player) => ({ ...player, name: player.name.trim() })));
     setIsReady(true);
   };
 
@@ -169,9 +161,10 @@ function Home() {
                 className="continue-button"
                 type="button"
                 onClick={continueToScoring}
+                disabled={!allNamesEntered}
                 data-testid="button-continue-to-scoring"
               >
-                <span>{isReady ? 'Trip register updated' : 'Continue to the trailhead'}</span>
+                <span>{isReady ? 'Trip register updated' : 'Start the hike'}</span>
                 <span className="continue-arrow">
                   {isReady ? (
                     <Check size={19} strokeWidth={2.2} aria-hidden="true" />
