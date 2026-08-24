@@ -286,6 +286,8 @@ function ScoringPage({
   setFirstPlayerId: (id: number) => void;
   onBack: () => void;
 }) {
+  const [showWinner, setShowWinner] = useState(false);
+
   const photoBonuses = useMemo(() => {
     const photoScores = players.map((player) => scores[player.id]?.photos ?? 0);
     const highest = Math.max(...photoScores);
@@ -314,6 +316,20 @@ function ScoringPage({
       + (seasonBonuses[player.id] ? 3 : 0)
       + (firstPlayerId === player.id ? 1 : 0);
   };
+
+  const winners = useMemo(() => {
+    const highestFinalScore = Math.max(...players.map(finalScore));
+    const finalScoreLeaders = players.filter(
+      (player) => finalScore(player) === highestFinalScore,
+    );
+    const highestParksScore = Math.max(
+      ...finalScoreLeaders.map((player) => scores[player.id]?.parks ?? 0),
+    );
+
+    return finalScoreLeaders.filter(
+      (player) => (scores[player.id]?.parks ?? 0) === highestParksScore,
+    );
+  }, [players, scores, photoBonuses, seasonBonuses, firstPlayerId]);
 
   const updateScore = (playerId: number, field: keyof BaseScores, value: number) => {
     setScores((current) => ({
@@ -459,6 +475,30 @@ function ScoringPage({
             <span><strong>Photo bonus</strong> awards 4 to the most photos, then 2 to the next distinct score.</span>
             <span>Scroll sideways on a narrow trail</span>
           </div>
+        </section>
+
+        <section className="winner-panel" aria-live="polite">
+          <button
+            className="winner-button"
+            type="button"
+            onClick={() => setShowWinner(true)}
+            data-testid="button-show-winner"
+          >
+            <span>Show winner</span>
+            <span className="winner-button-mark">
+              <ArrowRight size={17} strokeWidth={2} aria-hidden="true" />
+            </span>
+          </button>
+          {showWinner && (
+            <div className="winner-message" role="status" data-testid="status-winner">
+              <span className="winner-message-label">The trail belongs to</span>
+              <strong>
+                {winners.length === 1
+                  ? `${winners[0].name} wins`
+                  : `${winners.map((player) => player.name).join(', ')} win`}
+              </strong>
+            </div>
+          )}
         </section>
 
         <footer className="scoring-footer">
