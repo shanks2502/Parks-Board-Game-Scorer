@@ -1153,6 +1153,8 @@
 
 .ledger-caption strong { color: hsl(var(--foreground)); font-weight: 700; }
 
+.mobile-score-card { display: none; }
+
 .winner-panel {
   display: flex;
   align-items: center;
@@ -1264,8 +1266,8 @@
   .scoring-shell { width: min(100% - 28px, 620px); }
   .scoring-header { align-items: flex-start; padding-top: 18px; }
   .scoring-title-block { text-align: right; }
-  .scoring-title { font-size: clamp(2.8rem, 14vw, 4.5rem); }
-  .scoring-intro { display: block; padding: 35px 0 23px; }
+  .scoring-title { font-size: clamp(2.6rem, 13vw, 4.5rem); }
+  .scoring-intro { display: block; padding: 24px 0 18px; }
   .score-legend { margin-top: 18px; }
   .ledger-frame { padding: 6px; }
   .ledger-scroll { padding: 5px; }
@@ -1279,7 +1281,85 @@
 @media (max-width: 450px) {
   .scoring-kicker .brand-copy { display: none; }
   .back-button { padding-inline: 9px; font-size: .55rem; }
-  .score-table { min-width: 650px; }
-  .score-table thead th:first-child { width: 175px; }
+  .ledger-frame { display: none; }
+  .mobile-score-card {
+    display: block;
+    padding: 14px;
+    background: hsl(var(--card) / .72);
+    border: 1px solid hsl(var(--card-border));
+    box-shadow: var(--shadow-lg);
+    animation: card-in 650ms 100ms both cubic-bezier(.22, .8, .2, 1);
+  }
+  .mobile-player-heading {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) 40px;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0 12px;
+    border-bottom: 1px solid hsl(var(--border) / .7);
+    text-align: center;
+  }
+  .mobile-player-heading h2 {
+    overflow: hidden;
+    margin: 3px 0 0;
+    font-family: var(--app-font-serif);
+    font-size: 2rem;
+    font-weight: 400;
+    letter-spacing: -.03em;
+    line-height: .9;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .mobile-player-heading .player-column-number { margin-bottom: 0; }
+  .mobile-player-arrow {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    color: hsl(var(--foreground));
+    background: hsl(var(--background) / .68);
+    border: 1px solid hsl(var(--border));
+    border-radius: 50%;
+  }
+  .mobile-player-arrow:disabled { cursor: not-allowed; opacity: .25; }
+  .mobile-player-position {
+    padding: 10px 0 3px;
+    color: hsl(var(--muted-foreground));
+    font-family: var(--app-font-mono);
+    font-size: .56rem;
+    letter-spacing: .1em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .mobile-score-rows { margin-top: 5px; }
+  .mobile-score-row,
+  .mobile-final-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 61px;
+    padding: 8px 4px;
+    border-bottom: 1px solid hsl(var(--border) / .5);
+  }
+  .mobile-score-row .row-label,
+  .mobile-final-row .row-label { font-size: .76rem; }
+  .mobile-score-row .score-stepper { flex: 0 0 auto; }
+  .mobile-final-row {
+    min-height: 70px;
+    margin-top: 4px;
+    border-bottom: 0;
+    background: hsl(var(--primary) / .055);
+  }
+  .mobile-final-row .row-label {
+    font-family: var(--app-font-serif);
+    font-size: 1.12rem;
+    font-weight: 400;
+  }
+  .mobile-final-row .row-label::before { width: 7px; height: 7px; background: hsl(var(--destructive)); }
+  .mobile-final-row .readonly-score { color: hsl(var(--primary)); font-size: 1.1rem; }
+  .mobile-score-card .score-stepper { gap: 7px; padding: 4px; }
+  .mobile-score-card .step-button { width: 35px; height: 35px; }
+  .mobile-score-card .score-value { width: 30px; }
   .scoring-title { font-size: 3.3rem; }
 }

@@ -313,6 +313,103 @@ function ScoreRowLabel({ label, helper }: { label: string; helper?: string }) {
   );
 }
 
+function MobileScoreCard({
+  player,
+  playerIndex,
+  playerCount,
+  scores,
+  photoBonus,
+  seasonBonus,
+  isFirstPlayer,
+  updateScore,
+  setSeasonBonus,
+  setFirstPlayer,
+  onPrevious,
+  onNext,
+}: {
+  player: Player;
+  playerIndex: number;
+  playerCount: number;
+  scores: BaseScores;
+  photoBonus: number;
+  seasonBonus: boolean;
+  isFirstPlayer: boolean;
+  updateScore: (field: keyof BaseScores, value: number) => void;
+  setSeasonBonus: (checked: boolean) => void;
+  setFirstPlayer: () => void;
+  onPrevious: () => void;
+  onNext: () => void;
+}) {
+  const scoreRows: Array<[keyof BaseScores, string, string]> = [
+    ['parks', 'Parks', 'cards collected'],
+    ['passion', 'Passion', 'wildlife icons'],
+    ['photos', 'Photos', 'snapshots taken'],
+  ];
+
+  return (
+    <section className="mobile-score-card" aria-label={`Score ${player.name}`}>
+      <div className="mobile-player-heading">
+        <button type="button" className="mobile-player-arrow" onClick={onPrevious} disabled={playerIndex === 0} aria-label="Previous player">
+          <ArrowLeft size={18} strokeWidth={2} aria-hidden="true" />
+        </button>
+        <div>
+          <span className="player-column-number">Hiker 0{playerIndex + 1}</span>
+          <h2>{player.name}</h2>
+        </div>
+        <button type="button" className="mobile-player-arrow" onClick={onNext} disabled={playerIndex === playerCount - 1} aria-label="Next player">
+          <ArrowRight size={18} strokeWidth={2} aria-hidden="true" />
+        </button>
+      </div>
+      <div className="mobile-player-position">Player {playerIndex + 1} of {playerCount}</div>
+
+      <div className="mobile-score-rows">
+        {scoreRows.map(([field, label, helper]) => (
+          <div className="mobile-score-row" key={field}>
+            <ScoreRowLabel label={label} helper={helper} />
+            <ScoreStepper
+              value={scores[field]}
+              onChange={(value) => updateScore(field, value)}
+              testId={`mobile-score-${field}-${player.id}`}
+            />
+          </div>
+        ))}
+        <div className="mobile-score-row">
+          <ScoreRowLabel label="Photo bonus" helper="automatic" />
+          <span className={`readonly-score ${photoBonus ? 'highlight' : ''}`}>{photoBonus}</span>
+        </div>
+        <div className="mobile-score-row">
+          <ScoreRowLabel label="Season bonus" helper="3 points" />
+          <label className="season-toggle">
+            <input
+              type="checkbox"
+              checked={seasonBonus}
+              onChange={(event) => setSeasonBonus(event.target.checked)}
+              aria-label={`${player.name} season bonus`}
+            />
+            <Check size={17} strokeWidth={2.3} aria-hidden="true" />
+          </label>
+        </div>
+        <div className="mobile-score-row">
+          <ScoreRowLabel label="First player token" helper="choose one" />
+          <label className="token-radio">
+            <input
+              type="radio"
+              name="mobile-first-player"
+              checked={isFirstPlayer}
+              onChange={setFirstPlayer}
+              aria-label={`${player.name} has the first player token`}
+            />
+          </label>
+        </div>
+        <div className="mobile-final-row">
+          <ScoreRowLabel label="Final score" helper="total trail points" />
+          <span className="readonly-score">{scores.parks + scores.passion + scores.photos + photoBonus + (seasonBonus ? 3 : 0) + (isFirstPlayer ? 1 : 0)}</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ScoringPage({
   players,
   scores,
@@ -338,6 +435,7 @@ function ScoringPage({
 }) {
   const [showWinner, setShowWinner] = useState(false);
   const [winnerRecorded, setWinnerRecorded] = useState(false);
+  const [mobilePlayerIndex, setMobilePlayerIndex] = useState(0);
 
   const photoBonuses = useMemo(() => {
     const photoScores = players.map((player) => scores[player.id]?.photos ?? 0);
@@ -535,6 +633,24 @@ function ScoringPage({
             <span>Scroll sideways on a narrow trail</span>
           </div>
         </section>
+
+        <MobileScoreCard
+          player={players[mobilePlayerIndex]}
+          playerIndex={mobilePlayerIndex}
+          playerCount={players.length}
+          scores={scores[players[mobilePlayerIndex].id] ?? initialScores()}
+          photoBonus={photoBonuses[players[mobilePlayerIndex].id] ?? 0}
+          seasonBonus={seasonBonuses[players[mobilePlayerIndex].id] ?? false}
+          isFirstPlayer={firstPlayerId === players[mobilePlayerIndex].id}
+          updateScore={(field, value) => updateScore(players[mobilePlayerIndex].id, field, value)}
+          setSeasonBonus={(checked) => setSeasonBonuses((current) => ({
+            ...current,
+            [players[mobilePlayerIndex].id]: checked,
+          }))}
+          setFirstPlayer={() => setFirstPlayerId(players[mobilePlayerIndex].id)}
+          onPrevious={() => setMobilePlayerIndex((index) => Math.max(0, index - 1))}
+          onNext={() => setMobilePlayerIndex((index) => Math.min(players.length - 1, index + 1))}
+        />
 
         <section className="winner-panel" aria-live="polite">
           <button
