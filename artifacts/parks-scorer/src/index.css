@@ -303,6 +303,96 @@
 
 .field-note strong { font-weight: 600; }
 
+.game-history {
+  max-width: 520px;
+  margin-top: 46px;
+  padding-top: 20px;
+  border-top: 1px solid hsl(var(--border) / .72);
+}
+
+.history-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.history-heading .eyebrow { color: hsl(var(--muted-foreground)); }
+
+.history-heading h2 {
+  margin: 6px 0 0;
+  font-family: var(--app-font-serif);
+  font-size: 1.65rem;
+  font-weight: 400;
+  letter-spacing: -.03em;
+}
+
+.history-count {
+  color: hsl(var(--muted-foreground));
+  font-family: var(--app-font-mono);
+  font-size: .63rem;
+}
+
+.history-empty {
+  margin: 16px 0 0;
+  color: hsl(var(--muted-foreground));
+  font-size: .78rem;
+}
+
+.history-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid hsl(var(--border) / .5);
+}
+
+.history-date {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  color: hsl(var(--foreground));
+  font-family: var(--app-font-mono);
+  font-size: .68rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.history-date span {
+  color: hsl(var(--muted-foreground));
+  font-size: .59rem;
+}
+
+.history-winner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  text-align: right;
+}
+
+.history-winner span {
+  color: hsl(var(--muted-foreground));
+  font-family: var(--app-font-mono);
+  font-size: .56rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.history-winner strong {
+  color: hsl(var(--destructive));
+  font-family: var(--app-font-serif);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
 .setup-card {
   position: relative;
   padding: clamp(25px, 4vw, 41px);
@@ -1134,6 +1224,27 @@
   font-size: 1.45rem;
   font-weight: 400;
   letter-spacing: -.02em;
+}
+
+.new-game-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  color: hsl(var(--foreground));
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid hsl(var(--foreground) / .42);
+  font-family: var(--app-font-mono);
+  font-size: .59rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  transition: color 180ms ease, gap 180ms ease;
+}
+
+.new-game-button:hover {
+  gap: 11px;
+  color: hsl(var(--destructive));
 }
 
 .scoring-footer {

@@ -8,7 +8,6 @@ import {
   Check,
   Compass,
   MapPin,
-  Minus,
   Plus,
   TreePine,
   X,
@@ -30,6 +29,12 @@ type BaseScores = {
   parks: number;
   passion: number;
   photos: number;
+};
+
+type GameRecord = {
+  id: number;
+  playedAt: string;
+  winners: string[];
 };
 
 const initialScores = (): BaseScores => ({ parks: 0, passion: 0, photos: 0 });
@@ -66,10 +71,12 @@ function SetupPage({
   players,
   onPlayersChange,
   onStart,
+  games,
 }: {
   players: Player[];
   onPlayersChange: (players: Player[]) => void;
   onStart: () => void;
+  games: GameRecord[];
 }) {
   const allNamesEntered = players.every((player) => player.name.trim().length > 0);
 
@@ -119,6 +126,45 @@ function SetupPage({
               <Compass size={17} strokeWidth={1.5} aria-hidden="true" />
               <span><strong>First, a small ritual.</strong> Tell us who&apos;s along.</span>
             </div>
+            <section className="game-history" aria-labelledby="history-heading">
+              <div className="history-heading">
+                <div>
+                  <div className="eyebrow">Field journal</div>
+                  <h2 id="history-heading">Games played</h2>
+                </div>
+                <span className="history-count">{games.length}</span>
+              </div>
+              {games.length === 0 ? (
+                <p className="history-empty">Completed hikes will appear here.</p>
+              ) : (
+                <div className="history-list">
+                  {games.slice().reverse().map((game) => {
+                    const playedAt = new Date(game.playedAt);
+                    return (
+                      <div className="history-row" key={game.id}>
+                        <div className="history-date">
+                          {playedAt.toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                          <span>
+                            {playedAt.toLocaleTimeString(undefined, {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                            })}
+                          </span>
+                        </div>
+                        <div className="history-winner">
+                          <span>Winner</span>
+                          <strong>{game.winners.join(', ')}</strong>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
           </div>
 
           <section className="setup-card" aria-labelledby="setup-heading">
@@ -276,6 +322,8 @@ function ScoringPage({
   firstPlayerId,
   setFirstPlayerId,
   onBack,
+  onWinnerShown,
+  onNewGame,
 }: {
   players: Player[];
   scores: Record<number, BaseScores>;
@@ -285,8 +333,11 @@ function ScoringPage({
   firstPlayerId: number;
   setFirstPlayerId: (id: number) => void;
   onBack: () => void;
+  onWinnerShown: (winnerNames: string[]) => void;
+  onNewGame: () => void;
 }) {
   const [showWinner, setShowWinner] = useState(false);
+  const [winnerRecorded, setWinnerRecorded] = useState(false);
 
   const photoBonuses = useMemo(() => {
     const photoScores = players.map((player) => scores[player.id]?.photos ?? 0);
@@ -336,6 +387,14 @@ function ScoringPage({
       ...current,
       [playerId]: { ...(current[playerId] ?? initialScores()), [field]: Math.max(0, value) },
     }));
+  };
+
+  const revealWinner = () => {
+    setShowWinner(true);
+    if (!winnerRecorded) {
+      onWinnerShown(winners.map((player) => player.name));
+      setWinnerRecorded(true);
+    }
   };
 
   return (
@@ -481,7 +540,7 @@ function ScoringPage({
           <button
             className="winner-button"
             type="button"
-            onClick={() => setShowWinner(true)}
+            onClick={revealWinner}
             data-testid="button-show-winner"
           >
             <span>Show winner</span>
@@ -494,9 +553,13 @@ function ScoringPage({
               <span className="winner-message-label">The trail belongs to</span>
               <strong>
                 {winners.length === 1
-                  ? `${winners[0].name} wins`
-                  : `${winners.map((player) => player.name).join(', ')} win`}
+                  ? winners[0].name
+                  : winners.map((player) => player.name).join(', ')}
               </strong>
+              <button className="new-game-button" type="button" onClick={onNewGame} data-testid="button-new-game">
+                <span>New game</span>
+                <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
+              </button>
             </div>
           )}
         </section>
@@ -519,6 +582,7 @@ function Home() {
   const [scores, setScores] = useState<Record<number, BaseScores>>({});
   const [seasonBonuses, setSeasonBonuses] = useState<Record<number, boolean>>({});
   const [firstPlayerId, setFirstPlayerId] = useState(1);
+  const [games, setGames] = useState<GameRecord[]>([]);
 
   const startHike = () => {
     if (!players.every((player) => player.name.trim().length > 0)) return;
@@ -536,6 +600,21 @@ function Home() {
     setIsScoring(true);
   };
 
+  const recordGame = (winnerNames: string[]) => {
+    setGames((current) => [
+      ...current,
+      { id: Date.now(), playedAt: new Date().toISOString(), winners: winnerNames },
+    ]);
+  };
+
+  const startNewGame = () => {
+    setPlayers([{ id: 1, name: '' }, { id: 2, name: '' }]);
+    setScores({});
+    setSeasonBonuses({});
+    setFirstPlayerId(1);
+    setIsScoring(false);
+  };
+
   return isScoring ? (
     <ScoringPage
       players={players}
@@ -546,9 +625,11 @@ function Home() {
       firstPlayerId={firstPlayerId}
       setFirstPlayerId={setFirstPlayerId}
       onBack={() => setIsScoring(false)}
+      onWinnerShown={recordGame}
+      onNewGame={startNewGame}
     />
   ) : (
-    <SetupPage players={players} onPlayersChange={setPlayers} onStart={startHike} />
+    <SetupPage players={players} onPlayersChange={setPlayers} onStart={startHike} games={games} />
   );
 }
 
