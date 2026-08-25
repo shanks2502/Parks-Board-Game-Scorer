@@ -444,7 +444,7 @@ function ScoringPage({
       return Object.fromEntries(players.map((player) => [player.id, 0])) as Record<number, number>;
     }
     const allTied = photoScores.every((score) => score === highest);
-    const distinctBelowHighest = [...new Set(photoScores.filter((score) => score < highest))]
+    const distinctBelowHighest = [...new Set(photoScores.filter((score) => score > 0 && score < highest))]
       .sort((a, b) => b - a);
     const secondHighest = distinctBelowHighest[0];
 
